@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
 import joblib
+import pickle
 
 # Streamlit setup
 st.set_page_config(
@@ -147,8 +148,7 @@ def liver_page():
 
 
     # Load model
-    filename = 'https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/models/foiet.sav'
-    foie_model = joblib.load(filename)
+    foie_model = pickle.load(open('foiet.sav', 'rb'))
 
     # Create the input form below the container
     with st.form(key='liver_form'):
