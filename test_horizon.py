@@ -147,7 +147,7 @@ def liver_page():
 
 
     # Load model
-    filename = 'https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/models/foiet.sav'
+    filename = 'foiet.sav'
     foie_model = joblib.load(filename)
     
     # Create the input form below the container
@@ -200,7 +200,7 @@ def heart_page():
     st.markdown('<h3 class="subtitle">Détection de la Maladie Cardiaque</h3>', unsafe_allow_html=True)
     
     # Load the heart disease model
-    filename = 'https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/models/df_coeur_new.sav'
+    filename = 'df_coeur_new.sav'
     coeur_model = joblib.load(filename)
 
     # Create the input form below the container
@@ -274,7 +274,7 @@ def diabetes_page():
     st.markdown('<h3 class="subtitle">Prédiction du Diabète</h3>', unsafe_allow_html=True)
 
     # Load the diabetes model
-    filename = 'https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/models/diabete.sav'
+    filename = 'diabete.sav'
     diabete_model = joblib.load(filename)
 
     # Create the input form below the container
@@ -322,7 +322,7 @@ def breast_cancer_page():
     st.markdown('<h3 class="subtitle">Prédiction du Cancer du Sein</h3>', unsafe_allow_html=True)
 
     # Load the breast cancer model
-    filename = 'https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/models/seins.sav'
+    filename = 'seins.sav'
     seins_model = joblib.load(filename)
 
     # Create the input form below the container
@@ -373,7 +373,7 @@ def kidney_page():
     st.markdown('<h3 class="subtitle">Prédiction de la Maladie Rénale Chronique</h3>', unsafe_allow_html=True)
 
     # Load the breast cancer model
-    filename = 'https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/models/reins.sav'
+    filename = 'reins.sav'
     reins_model = joblib.load(filename)
 
     # Create the input form below the container
