@@ -274,7 +274,7 @@ def diabetes_page():
     st.markdown('<h3 class="subtitle">Prédiction du Diabète</h3>', unsafe_allow_html=True)
 
     # Load the diabetes model
-    diabete_model = joblib.load(open('diabete.sav'))
+    diabete_model = joblib.load(open('diabete.sav', 'rb'))
 
     # Create the input form below the container
     with st.form(key='diabetes_form'):
