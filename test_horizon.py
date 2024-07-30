@@ -1,9 +1,6 @@
 import streamlit as st
 import numpy as np
 import joblib
-import requests
-import os
-import tempfile
 
 # Streamlit setup
 st.set_page_config(
@@ -11,14 +8,6 @@ st.set_page_config(
     layout="wide",
     page_icon='🧪'
 )
-
-# Helper function to download a file from a URL
-def download_file(url):
-    response = requests.get(url)
-    response.raise_for_status()
-    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
-        tmp_file.write(response.content)
-        return tmp_file.name
 
 def main():
     st.markdown(
@@ -146,7 +135,7 @@ def display_navigation_buttons(page_suffix):
             st.session_state.page = 'diabetes'
             st.experimental_rerun()
     with col6:
-        if st.button('Cancer du Sein', key=f'brest_cancer_button_{page_suffix}_{st.session_state.page}'):
+        if st.button('Cancer du Sein', key=f'breast_cancer_button_{page_suffix}_{st.session_state.page}'):
             st.session_state.page = 'breast_cancer'
             st.experimental_rerun()
     st.markdown('</div>', unsafe_allow_html=True)
@@ -156,8 +145,9 @@ def liver_page():
     display_navigation_buttons('liver')
     st.markdown('<h3 class="subtitle">Détection de la Maladie Chronique du Foie</h3>', unsafe_allow_html=True)
 
-    # Download and load model
-    filename = download_file('https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/models/foiet.sav')
+
+    # Load model
+    filename = 'https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/models/foiet.sav'
     foie_model = joblib.load(filename)
 
     # Create the input form below the container
@@ -194,4 +184,238 @@ def liver_page():
             with col_center[1]:
                 st.image("https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/pictures/foie.png")
             st.markdown('<div class="center"><p style="color: red; font-size: 24px;">Suspicion détectée</p></div>', unsafe_allow_html=True)
-            st.markdown('<div class="center"><p style="color: white; font-size: 16px;">Les résultats préliminaires suggèrent une prob
+            st.markdown('<div class="center"><p style="color: white; font-size: 16px;">Les résultats préliminaires suggèrent une probabilité de maladie du foie. Des examens complémentaires sont recommandés pour confirmation.</p></div>', unsafe_allow_html=True)
+        else:
+            col_center = st.columns([3, 1, 3])
+            with col_center[1]:
+                st.image("https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/pictures/foie.png")
+            st.markdown('<div class="center"><p style="color: green; font-size: 24px;">Pas de suspicion</p></div>', unsafe_allow_html=True)
+            st.markdown('<div class="center"><p style="color: white; font-size: 16px;">Les résultats préliminaires indiquent une faible probabilité de maladie du foie. Veuillez continuer le suivi médical habituel.</p></div>', unsafe_allow_html=True)
+
+
+# Placeholder functions for other pages
+def heart_page():
+    st.image("https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/photo_horizon.png", use_column_width=True)
+    display_navigation_buttons('heart')
+    st.markdown('<h3 class="subtitle">Détection de la Maladie Cardiaque</h3>', unsafe_allow_html=True)
+
+    # Load the heart disease model
+    filename = 'https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/models/df_coeur_new.sav'
+    coeur_model = joblib.load(filename)
+
+    # Create the input form below the container
+    with st.form(key='heart_form'):
+        # Define age range
+        age_range = list(range(1, 100))
+
+        # Split Columns
+        col1, col2, col3, col4 = st.columns(4)
+
+        with col1:
+            age = st.selectbox('Entrez votre âge', age_range)
+            Douleur = st.number_input('Entrez la douleur ressentie : CP')
+            Electro = st.number_input('Entrez le résultat de l\'électrocardiographie : RESTECG')
+            Angine = st.number_input('Y a-t-il eu une angine induite par un exercice physique : EXANG')
+        with col2:
+            Genre = st.selectbox('Entrez votre genre', ['Homme', 'Femme'])
+            Pression = st.number_input('Entrez la valeur de la pression arterielle au repos : TRESTBPS')
+            FC = st.number_input('Entrez la valeur de la fréquence cardiaque maximale : THALACH')
+            Oldpeak = st.number_input('Dépression du segment ST induite par un exercice par rapport au repos : OLDPEAK')
+        with col3:
+            Cholesterol = st.number_input('Entrez la valeur du cholesterol : CHOL')
+            Sucre = st.number_input('Entrez la valeur de sucre dans le sang à jeun : FBS')
+            Slope = st.number_input('Valeur de la pente du segment ST à un effort maximal : SLOPE')
+            CA = st.number_input('Nombre de vaisseaux majeurs colorés par fluoroscopie : CA')
+        with col4:
+            Thal = st.number_input('Type de thalassémie : THAL')
+
+        # Center the submit button
+        col_center = st.columns([3, 1, 3])
+        with col_center[1]:
+            submit_button = st.form_submit_button(label='Test de Prédiction Cardiaque')
+
+    # Prediction
+    if submit_button:
+        # Prepare input data
+        input_data = np.array([[age, 
+                                1 if Genre == 'Homme' else 0,  # Assuming 'Homme' = 1, 'Femme' = 0
+                                Douleur, Pression, Cholesterol, 
+                                1 if Sucre > 0 else 0,  # Assuming 'Sucre' > 0 means True
+                                Electro, FC, 
+                                1 if Angine > 0 else 0,  # Assuming 'Angine' > 0 means True
+                                Oldpeak, Slope, CA, Thal]])
+
+        # Perform prediction
+        renale_prediction = coeur_model.predict(input_data)
+
+        if renale_prediction[0] == 1:
+            col_center = st.columns([3, 1, 3])
+            with col_center[1]:
+                st.image("https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/pictures/coeur.png")  # Add an appropriate heart image
+            st.markdown('<div class="center"><p style="color: red; font-size: 24px;">Suspicion détectée</p></div>', unsafe_allow_html=True)
+            st.markdown('<div class="center"><p style="color: white; font-size: 16px;">Les résultats préliminaires suggèrent une probabilité de maladie du cœur. Des examens complémentaires sont recommandés pour confirmation.</p></div>', unsafe_allow_html=True)
+        else:
+            col_center = st.columns([3, 1, 3])
+            with col_center[1]:
+                st.image("https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/pictures/coeur.png")  # Add an appropriate heart image
+            st.markdown('<div class="center"><p style="color: green; font-size: 24px;">Pas de suspicion</p></div>', unsafe_allow_html=True)
+            st.markdown('<div class="center"><p style="color: white; font-size: 16px;">Les résultats préliminaires indiquent une faible probabilité de maladie du cœur. Veuillez continuer le suivi médical habituel.</p></div>', unsafe_allow_html=True)
+
+def kidney_page():
+    st.markdown('<h3 class="subtitle">Détection de la Maladie Rénale</h3>', unsafe_allow_html=True)
+    st.image("https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/photo_horizon.png", use_column_width=True)
+    display_navigation_buttons('kidney')
+    st.markdown('<h3 class="subtitle">Détection de la Maladie Rénale</h3>', unsafe_allow_html=True)
+
+
+def diabetes_page():
+    st.image("https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/photo_horizon.png", use_column_width=True)
+    display_navigation_buttons('diabetes')
+    st.markdown('<h3 class="subtitle">Prédiction du Diabète</h3>', unsafe_allow_html=True)
+
+    # Load the diabetes model
+    filename = 'https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/models/diabete.sav'
+    diabete_model = joblib.load(filename)
+
+    # Create the input form below the container
+    with st.form(key='diabetes_form'):
+        # Split Columns
+        col1, col2, col3, col4, col5 = st.columns(5)
+
+        with col2:
+            Pregnancies = st.number_input('Entrez la valeur des grossesses')
+            BloodPressure = st.number_input('Entrez la valeur de la pression artérielle')
+            BMI = st.number_input("Entrez la valeur de l'IMC (Indice de Masse Corporelle)")
+            Age = st.number_input("Entrez la valeur de l'âge")
+
+        with col4:
+            Glucose = st.number_input('Entrez la valeur de la glycémie')
+            Insulin = st.number_input("Entrez la valeur de l'insuline")
+            DiabetesPedigreeFunction = st.number_input('Entrez la valeur de la fonction de pedigree du diabète', format="%.3f")
+
+        # Center the submit button
+        col_center = st.columns([3, 1, 3])
+        with col_center[1]:
+            submit_button = st.form_submit_button(label='Test de Prédiction du Diabète')
+
+    # Prediction
+    if submit_button:
+        # Prediction input without SkinThickness
+        diabetes_prediction = diabete_model.predict([[Pregnancies, Glucose, BloodPressure, Insulin, BMI, DiabetesPedigreeFunction, Age]])
+
+        if diabetes_prediction[0] == 1:
+            col_center = st.columns([3, 1, 3])
+            with col_center[1]:
+                st.image("https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/pictures/diabete.png")  # Add an appropriate diabetes image
+            st.markdown('<div class="center"><p style="color: red; font-size: 24px;">Suspicion détectée</p></div>', unsafe_allow_html=True)
+            st.markdown('<div class="center"><p style="color: white; font-size: 16px;">Les résultats préliminaires suggèrent une probabilité de maladie diabétique. Des examens complémentaires sont recommandés pour confirmation.</p></div>', unsafe_allow_html=True)
+        else:
+            col_center = st.columns([3, 1, 3])
+            with col_center[1]:
+                st.image("https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/pictures/diabete.png")  # Add an appropriate diabetes image
+            st.markdown('<div class="center"><p style="color: green; font-size: 24px;">Pas de suspicion</p></div>', unsafe_allow_html=True)
+            st.markdown('<div class="center"><p style="color: white; font-size: 16px;">Les résultats préliminaires indiquent une faible probabilité de maladie diabétique. Veuillez continuer le suivi médical habituel.</p></div>', unsafe_allow_html=True)
+
+def breast_cancer_page():
+    st.image("https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/photo_horizon.png", use_column_width=True)
+    display_navigation_buttons('breast_cancer')
+    st.markdown('<h3 class="subtitle">Prédiction du Cancer du Sein</h3>', unsafe_allow_html=True)
+
+    # Load the breast cancer model
+    filename = 'https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/models/seins.sav'
+    seins_model = joblib.load(filename)
+
+    # Create the input form below the container
+    with st.form(key='breast_cancer_form'):
+        # Split Columns
+        col1, col2, col3, col4, col5 = st.columns(5)
+
+        with col2:
+            Radius = st.number_input('Entrez la valeur de Radius Mean')
+            Perimeter = st.number_input('Entrez la valeur de Perimeter Mean')
+            Smoothness = st.number_input("Entrez la valeur de Smoothness Mean", format="%.4f")
+            Concavity = st.number_input("Entrez la valeur de Concavity Mean", format="%.4f")
+            Symmetry = st.number_input("Entrez la valeur de Symmetry Mean", format="%.4f")
+
+        with col4:
+            Texture = st.number_input('Entrez la valeur de Texture Mean')
+            Area = st.number_input("Entrez la valeur de Area Mean")
+            Compactness = st.number_input('Entrez la valeur de Compactness Mean', format="%.4f")
+            Concave_point = st.number_input("Entrez la valeur de Concave Point Mean", format="%.5f")
+            Fractal = st.number_input("Entrez la valeur de Fractal Dimension Mean", format="%.5f")
+
+        # Center the submit button
+        col_center = st.columns([3, 1, 3])
+        with col_center[1]:
+            submit_button = st.form_submit_button(label='Test de Prédiction du Cancer du sein')
+
+    # Prediction
+    if submit_button:
+        # Prediction input without SkinThickness
+        seins_prediction = seins_model.predict([[Radius, Texture, Perimeter, Area, Smoothness, Compactness, Concavity, Concave_point, Symmetry, Fractal]])
+
+        if seins_prediction[0] == 1:
+            col_center = st.columns([3, 1, 3])
+            with col_center[1]:
+                st.image("https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/pictures/seins.png")  # Add an appropriate breast cancer image
+            st.markdown('<div class="center"><p style="color: red; font-size: 24px;">Suspicion détectée</p></div>', unsafe_allow_html=True)
+            st.markdown('<div class="center"><p style="color: white; font-size: 16px;">Les résultats préliminaires suggèrent une probabilité de cancer du sein. Des examens complémentaires sont recommandés pour confirmation.</p></div>', unsafe_allow_html=True)
+        else:
+            col_center = st.columns([3, 1, 3])
+            with col_center[1]:
+                st.image("https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/pictures/seins.png")  # Add an appropriate breast cancer image
+            st.markdown('<div class="center"><p style="color: green; font-size: 24px;">Pas de suspicion</p></div>', unsafe_allow_html=True)
+            st.markdown('<div class="center"><p style="color: white; font-size: 16px;">Les résultats préliminaires indiquent une faible probabilité de cancer du sein. Veuillez continuer le suivi médical habituel.</p></div>', unsafe_allow_html=True)
+
+def kidney_page():
+    st.image("https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/photo_horizon.png", use_column_width=True)
+    display_navigation_buttons('kidney')
+    st.markdown('<h3 class="subtitle">Prédiction de la Maladie Rénale Chronique</h3>', unsafe_allow_html=True)
+
+    # Load the breast cancer model
+    filename = 'https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/models/reins.sav'
+    reins_model = joblib.load(filename)
+
+    # Create the input form below the container
+    with st.form(key='kidney_form'):
+        # Split Columns
+        col1, col2, col3, col4, col5 = st.columns(5)
+
+        with col2:
+            age = st.selectbox('Entrez votre âge', list(range(0, 100)))
+            sod = st.number_input('Entrez la valeur du sodium')
+            hemo = st.number_input('Entrez la valeur de l\'hémoglobine')
+            sg = st.number_input('Entrez la valeur du SG')
+            sc = st.number_input('Entrez la valeur du SC')
+
+        with col4:
+            bp = st.number_input('Entrez la valeur de la pression artérielle')
+            pot = st.number_input('Entrez la valeur du potassium')
+            al = st.number_input('Entrez la valeur de l\'albumine')
+            su = st.number_input('Entrez la valeur du SU')
+
+        # Center the submit button
+        col_center = st.columns([3, 1, 3])
+        with col_center[1]:
+            submit_button = st.form_submit_button(label='Test de Prédiction de la Maladie Rénale')
+
+    # Prediction
+    if submit_button:
+        # Prediction input without SkinThickness
+        reins_prediction = reins_model.predict([[age,sod, hemo, sg, sc, bp, pot, al, su ]])
+
+        if reins_prediction[0] == 1:
+            col_center = st.columns([3, 1, 3])
+            with col_center[1]:
+                st.image("https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/pictures/reins.png")  # Add an appropriate breast cancer image
+            st.markdown('<div class="center"><p style="color: red; font-size: 24px;">Suspicion détectée</p></div>', unsafe_allow_html=True)
+            st.markdown('<div class="center"><p style="color: white; font-size: 16px;">Les résultats préliminaires suggèrent une probabilité de maladie rénale. Des examens complémentaires sont recommandés pour confirmation.</p></div>', unsafe_allow_html=True)
+        else:
+            col_center = st.columns([3, 1, 3])
+            with col_center[1]:
+                st.image("https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/pictures/reins.png")  # Add an appropriate breast cancer image
+            st.markdown('<div class="center"><p style="color: green; font-size: 24px;">Pas de suspicion</p></div>', unsafe_allow_html=True)
+            st.markdown('<div class="center"><p style="color: white; font-size: 16px;">Les résultats préliminaires indiquent une faible probabilité de maladie rénale. Veuillez continuer le suivi médical habituel.</p></div>', unsafe_allow_html=True)
+
+if __name__ == '__main__':
+    main()
