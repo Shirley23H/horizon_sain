@@ -148,7 +148,8 @@ def liver_page():
 
 
     # Load model
-    foie_model = pickle.load(open('foiet.sav', 'rb'))
+    foie_model = joblib.load(open('foiet.sav', 'rb'))
+    
 
     # Create the input form below the container
     with st.form(key='liver_form'):
@@ -200,8 +201,8 @@ def heart_page():
     st.markdown('<h3 class="subtitle">Détection de la Maladie Cardiaque</h3>', unsafe_allow_html=True)
 
     # Load the heart disease model
-    filename = 'https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/models/df_coeur_new.sav'
-    coeur_model = joblib.load(filename)
+    coeur_model = joblib.load(open('df_coeur_new.sav', 'rb'))
+    
 
     # Create the input form below the container
     with st.form(key='heart_form'):
@@ -321,8 +322,8 @@ def breast_cancer_page():
     st.markdown('<h3 class="subtitle">Prédiction du Cancer du Sein</h3>', unsafe_allow_html=True)
 
     # Load the breast cancer model
-    filename = 'https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/models/seins.sav'
-    seins_model = joblib.load(filename)
+    seins_model = joblib.load(open('seins.sav', 'rb'))
+   
 
     # Create the input form below the container
     with st.form(key='breast_cancer_form'):
@@ -373,8 +374,8 @@ def kidney_page():
 
     # Load the breast cancer model
     filename = 'https://raw.githubusercontent.com/Shirley23H/horizon_sain/main/models/reins.sav'
-    reins_model = joblib.load(filename)
-
+    reins_model = joblib.load(open('reins.sav', 'rb'))
+    
     # Create the input form below the container
     with st.form(key='kidney_form'):
         # Split Columns
